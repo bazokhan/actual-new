@@ -29,9 +29,49 @@ export const SHAPES = {
   ARRAYFIRST: "arrayfirst",
 };
 
+export const rawQuery = async (url, { shape = SHAPES.ARRAY } = {}) => {
+  try {
+    const [res, metares] = await Promise.all([
+      fetch(url.replace("?_shape=arrays", `?_shape=${shape}`)),
+      fetch(url),
+    ]);
+    const data = await res?.json?.();
+    const meta = await metares?.json?.();
+    delete meta.rows;
+    delete meta.columns;
+    const {
+      next,
+      next_url,
+      suggested_facets,
+      facet_results,
+      filtered_table_rows_count,
+    } = meta;
+    const { error, status, ok } = data;
+    if (error) {
+      return {
+        error,
+        status,
+        ok,
+        data: null,
+      };
+    }
+    return {
+      data,
+      next,
+      next_url,
+      suggested_facets,
+      facet_results,
+      filtered_table_rows_count,
+    };
+  } catch (error) {
+    console.log({ error });
+    return { error, data: null };
+  }
+};
+
 export const query = async (
   url,
-  { shape = SHAPES.ARRAYS, where = null, facet = null, labels = null }
+  { shape = SHAPES.ARRAY, where = null, facet = null, labels = null } = {}
 ) => {
   const params =
     where?.reduce(
@@ -41,17 +81,46 @@ export const query = async (
   const foreign_labels =
     labels?.reduce((prev, label) => `${prev}&_label=${label}`, "") || "";
   try {
-    const res = await fetch(
-      `http://localhost:8001/db/${url}.json?_shape=${shape}${params}${foreign_labels}${
-        facet ? `&_facet=${facet}` : ""
-      }&_labels=on`
-    );
+    const [res, metares] = await Promise.all([
+      fetch(
+        `http://localhost:8001/db/${url}.json?_shape=${shape}${params}${foreign_labels}${
+          facet ? `&_facet=${facet}` : ""
+        }`
+      ),
+      fetch(
+        `http://localhost:8001/db/${url}.json?_shape=${
+          SHAPES.ARRAYS
+        }${params}${foreign_labels}${facet ? `&_facet=${facet}` : ""}`
+      ),
+    ]);
     const data = await res?.json?.();
+    const meta = await metares?.json?.();
+    delete meta.rows;
+    delete meta.columns;
+    const {
+      next,
+      next_url,
+      suggested_facets,
+      facet_results,
+      filtered_table_rows_count,
+    } = meta;
     const { error, status, ok } = data;
     if (error) {
-      return { error, status, ok, data: null };
+      return {
+        error,
+        status,
+        ok,
+        data: null,
+      };
     }
-    return { data };
+    return {
+      data,
+      next,
+      next_url,
+      suggested_facets,
+      facet_results,
+      filtered_table_rows_count,
+    };
   } catch (error) {
     console.log({ error });
     return { error, data: null };
