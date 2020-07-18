@@ -1,0 +1,14 @@
+{
+  "databases": {
+    "db": {
+      "tables": {
+        "transactions": {
+          "units": {
+            "amount": "P"
+          }
+        }
+      }
+    }
+  },
+  "custom_units": ["piasters = [] = P", "egyptian_pound = piasters / 100 = EGP"]
+}

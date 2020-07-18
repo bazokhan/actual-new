@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve-db": "datasette serve --cors ./db/db.sqlite",
+    "serve-db": "datasette serve --cors --metadata metadata.json ./db/db.sqlite",
     "serve-client": "next dev",
     "dev": "concurrently \"yarn:serve-*\"",
     "build": "next build",
