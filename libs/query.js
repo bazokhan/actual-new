@@ -1,39 +1,40 @@
 export const TYPES = {
-  EXACT: "exact",
-  NOT: "not",
-  CONTAINS: "contains",
-  ENDSWITH: "endswith",
-  STARTSWITH: "startswith",
-  GT: "gt",
-  GTE: "gte",
-  LT: "lt",
-  LTE: "lte",
-  LIKE: "like",
-  NOTLIKE: "notlike",
-  GLOB: "glob",
-  IN: "in",
-  NOTIN: "notin",
-  ARRAYCONTAINS: "arraycontains",
-  DATE: "date",
-  ISNULL: "isnull",
-  NOTNULL: "notnull",
-  ISBLANK: "isblank",
-  NOTBLANK: "notblank",
+  EXACT: 'exact',
+  NOT: 'not',
+  CONTAINS: 'contains',
+  ENDSWITH: 'endswith',
+  STARTSWITH: 'startswith',
+  GT: 'gt',
+  GTE: 'gte',
+  LT: 'lt',
+  LTE: 'lte',
+  LIKE: 'like',
+  NOTLIKE: 'notlike',
+  GLOB: 'glob',
+  IN: 'in',
+  NOTIN: 'notin',
+  ARRAYCONTAINS: 'arraycontains',
+  DATE: 'date',
+  ISNULL: 'isnull',
+  NOTNULL: 'notnull',
+  ISBLANK: 'isblank',
+  NOTBLANK: 'notblank'
 };
 
 export const SHAPES = {
-  ARRAYS: "arrays",
-  OBJECTS: "objects",
-  ARRAY: "array",
-  OBJECT: "object",
-  ARRAYFIRST: "arrayfirst",
+  ARRAYS: 'arrays',
+  OBJECTS: 'objects',
+  ARRAY: 'array',
+  OBJECT: 'object',
+  ARRAYFIRST: 'arrayfirst'
 };
 
 export const rawQuery = async (url, { shape = SHAPES.ARRAY } = {}) => {
+  if (!url) return { error: 'No Url', data: null };
   try {
     const [res, metares] = await Promise.all([
-      fetch(url.replace("?_shape=arrays", `?_shape=${shape}`)),
-      fetch(url),
+      fetch(url.replace('?_shape=arrays', `?_shape=${shape}`)),
+      fetch(url)
     ]);
     const data = await res?.json?.();
     const meta = await metares?.json?.();
@@ -41,10 +42,10 @@ export const rawQuery = async (url, { shape = SHAPES.ARRAY } = {}) => {
     delete meta.columns;
     const {
       next,
-      next_url,
-      suggested_facets,
-      facet_results,
-      filtered_table_rows_count,
+      next_url: nextUrl,
+      suggested_facets: suggestedFacets,
+      facet_results: facetResults,
+      filtered_table_rows_count: rowsCount
     } = meta;
     const { error, status, ok } = data;
     if (error) {
@@ -52,19 +53,19 @@ export const rawQuery = async (url, { shape = SHAPES.ARRAY } = {}) => {
         error,
         status,
         ok,
-        data: null,
+        data: null
       };
     }
     return {
       data,
       next,
-      next_url,
-      suggested_facets,
-      facet_results,
-      filtered_table_rows_count,
+      nextUrl,
+      suggestedFacets,
+      facetResults,
+      rowsCount
     };
   } catch (error) {
-    console.log({ error });
+    console.log(error);
     return { error, data: null };
   }
 };
@@ -73,25 +74,26 @@ export const query = async (
   url,
   { shape = SHAPES.ARRAY, where = null, facet = null, labels = null } = {}
 ) => {
+  if (!url) return { error: 'No Url', data: null };
   const params =
     where?.reduce(
       (prev, param) => `${prev}&${param.column}__${param.type}=${param.value}`,
-      ""
-    ) || "";
-  const foreign_labels =
-    labels?.reduce((prev, label) => `${prev}&_label=${label}`, "") || "";
+      ''
+    ) || '';
+  const foreignLabels =
+    labels?.reduce((prev, label) => `${prev}&_label=${label}`, '') || '';
   try {
     const [res, metares] = await Promise.all([
       fetch(
-        `http://localhost:8001/db/${url}.json?_shape=${shape}${params}${foreign_labels}${
-          facet ? `&_facet=${facet}` : ""
+        `http://localhost:8001/db/${url}.json?_shape=${shape}${params}${foreignLabels}${
+          facet ? `&_facet=${facet}` : ''
         }`
       ),
       fetch(
         `http://localhost:8001/db/${url}.json?_shape=${
           SHAPES.ARRAYS
-        }${params}${foreign_labels}${facet ? `&_facet=${facet}` : ""}`
-      ),
+        }${params}${foreignLabels}${facet ? `&_facet=${facet}` : ''}`
+      )
     ]);
     const data = await res?.json?.();
     const meta = await metares?.json?.();
@@ -99,10 +101,10 @@ export const query = async (
     delete meta.columns;
     const {
       next,
-      next_url,
-      suggested_facets,
-      facet_results,
-      filtered_table_rows_count,
+      next_url: nextUrl,
+      suggested_facets: suggestedFacets,
+      facet_results: facetResults,
+      filtered_table_rows_count: rowsCount
     } = meta;
     const { error, status, ok } = data;
     if (error) {
@@ -110,19 +112,19 @@ export const query = async (
         error,
         status,
         ok,
-        data: null,
+        data: null
       };
     }
     return {
       data,
       next,
-      next_url,
-      suggested_facets,
-      facet_results,
-      filtered_table_rows_count,
+      nextUrl,
+      suggestedFacets,
+      facetResults,
+      rowsCount
     };
   } catch (error) {
-    console.log({ error });
+    console.log(error);
     return { error, data: null };
   }
 };

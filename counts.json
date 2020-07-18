@@ -1,0 +1,54 @@
+{
+  "db": {
+    "hash": "4aed7c97a814dd85c6d661e0d957b00e5effa47c7068996f5b08ac7561888faa",
+    "size": 7954432,
+    "file": "./db/db.sqlite",
+    "tables": {
+      "pending_transactions": {
+        "count": 0
+      },
+      "created_budgets": {
+        "count": 0
+      },
+      "spreadsheet_cells": {
+        "count": 3869
+      },
+      "__migrations__": {
+        "count": 6
+      },
+      "banks": {
+        "count": 0
+      },
+      "accounts": {
+        "count": 3
+      },
+      "category_mapping": {
+        "count": 29
+      },
+      "transactions": {
+        "count": 3310
+      },
+      "messages_crdt": {
+        "count": 28634
+      },
+      "messages_clock": {
+        "count": 1
+      },
+      "categories": {
+        "count": 29
+      },
+      "payees": {
+        "count": 118
+      },
+      "payee_rules": {
+        "count": 3
+      },
+      "payee_mapping": {
+        "count": 118
+      },
+      "category_groups": {
+        "count": 5
+      }
+    }
+  }
+}

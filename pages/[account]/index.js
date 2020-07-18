@@ -1,107 +1,58 @@
-import Head from "next/head";
-import { Heading, Tag, ThemeProvider, theme, Button } from "@chakra-ui/core";
-import { useMemo } from "react";
-import { TYPES, query, SHAPES, rawQuery } from "../../libs/query";
-import { useState } from "react";
-import { useEffect } from "react";
-import styled from "@emotion/styled";
-import { css } from "@emotion/core";
-import { Text, useColorMode, CSSReset } from "@chakra-ui/core";
+import PropTypes from 'prop-types';
+import Head from 'next/head';
+import {
+  Heading,
+  ThemeProvider,
+  theme,
+  Button,
+  CSSReset
+} from '@chakra-ui/core';
+import { useState, useEffect } from 'react';
+import { TYPES, query, SHAPES, rawQuery } from '../../libs/query';
+
+import { Table, TBody, TBodyTR, TBodyTD } from '../../components/Table/Table';
 
 export const getServerSidePaths = async () => {
-  const { accounts } = await query("accounts", {
-    shape: SHAPES.ARRAY,
+  const { accounts } = await query('accounts', {
+    shape: SHAPES.ARRAY
   });
   return {
     paths: accounts?.map((account) => `/${account.id}`) || [],
-    fallback: false,
+    fallback: false
   };
 };
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
-    const { data, next, next_url, filtered_table_rows_count } = await query(
-      "transactions",
-      {
-        where: [
-          { column: "acct", type: TYPES.EXACT, value: account },
-          { column: "tombstone", type: TYPES.EXACT, value: 0 },
-        ],
-      }
-    );
+    const { data, next, nextUrl, rowsCount } = await query('transactions', {
+      where: [
+        { column: 'acct', type: TYPES.EXACT, value: account },
+        { column: 'tombstone', type: TYPES.EXACT, value: 0 }
+      ]
+    });
     return {
       props: {
         transactions: data,
         next,
-        next_url,
-        filtered_table_rows_count,
-      },
+        nextUrl,
+        rowsCount
+      }
     };
   } catch {
     return {
       props: {
-        transactions: [],
-      },
+        transactions: []
+      }
     };
   }
 };
 
-const cell = () => css`
-  text-align: left;
-  font-weight: 400;
-  vertical-align: middle;
-  padding: 5px;
-
-  &:first-child {
-    padding-left: 5px;
-  }
-  &:last-child {
-    padding-right: 5px;
-  }
-`;
-
-const Wrapper = styled("table")`
-  width: 100%;
-  max-width: 100%;
-`;
-
-const TRWrapper = styled("tr")`
-  &:nth-of-type(odd) {
-    background-color: #333;
-  }
-`;
-
-const Table = ({ children }) => <Wrapper>{children}</Wrapper>;
-const TBody = ({ children }) => <tbody>{children}</tbody>;
-const TBodyTR = ({ children }) => <TRWrapper>{children}</TRWrapper>;
-
-const TDWrapper = styled("td")`
-  ${cell};
-  font-size: 16px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  border-top-width: 1px;
-`;
-
-const TBodyTD = ({ children }) => {
-  const { colorMode } = useColorMode();
-
-  const color = useMemo(
-    () => (colorMode === "dark" ? "gray.300" : "gray.600"),
-    [colorMode]
-  );
-
-  return (
-    <TDWrapper>
-      <Text color={color}>{children}</Text>
-    </TDWrapper>
-  );
-};
+// const usePagination = () => {};
 
 const Home = ({
   transactions: initialTransactions,
   next: initialNext,
-  next_url: initialUrl,
-  filtered_table_rows_count,
+  nextUrl: initialUrl,
+  rowsCount
 }) => {
   const [index, setIndex] = useState(0);
   const [transactions, setTransactions] = useState(initialTransactions);
@@ -114,7 +65,9 @@ const Home = ({
   const fetchMore = async () => {
     try {
       const { data, next: newNext, next_url: newUrl } = await rawQuery(nextUrl);
-      setTransactions([...transactions, ...data]);
+      if (data) {
+        setTransactions([...transactions, ...data]);
+      }
       setNext(newNext);
       setNextUrl(newUrl);
     } catch (err) {
@@ -125,7 +78,7 @@ const Home = ({
   const getNextPage = async () => {
     const newIndex = index + 1;
     const targetDataLength = newIndex * 100 + 100;
-    if (next && transactions.length < targetDataLength) {
+    if (next && transactions.length <= targetDataLength) {
       await fetchMore();
     }
     setIndex(newIndex);
@@ -140,13 +93,11 @@ const Home = ({
   };
 
   const getLastPage = async () => {
-    setIndex(Math.floor(filtered_table_rows_count / 100));
+    setIndex(Math.floor(rowsCount / 100));
   };
 
   useEffect(() => {
-    setActiveTransactions(
-      transactions.slice(index * 100, (index + 1) * 100)
-    );
+    setActiveTransactions(transactions.slice(index * 100, (index + 1) * 100));
   }, [index, transactions]);
 
   return (
@@ -157,9 +108,13 @@ const Home = ({
       </Head>
       <ThemeProvider theme={theme}>
         <CSSReset />
-        <Heading>{activeTransactions?.length} transactions</Heading>
+        <Heading as="h2">
+          {activeTransactions?.length} transactions of {rowsCount} total
+          transactions
+        </Heading>
+        <Heading as="h6">page number {index + 1}</Heading>
         <Button
-          isDisabled={index * 100 + 100 >= filtered_table_rows_count}
+          isDisabled={index * 100 + 100 >= rowsCount}
           onClick={getNextPage}
         >
           Next
@@ -171,7 +126,7 @@ const Home = ({
           First Page
         </Button>
         <Button
-          isDisabled={index === Math.floor(filtered_table_rows_count / 100)}
+          isDisabled={index === Math.floor(rowsCount / 100)}
           onClick={getLastPage}
         >
           Last Page
@@ -181,7 +136,7 @@ const Home = ({
             {activeTransactions?.map?.((transaction) => (
               <TBodyTR key={transaction.id}>
                 <TBodyTD>{transaction?.amount}</TBodyTD>
-                <TBodyTD>{transaction?.category || "Uncategorized"}</TBodyTD>
+                <TBodyTD>{transaction?.category || 'Uncategorized'}</TBodyTD>
               </TBodyTR>
             ))}
           </TBody>
@@ -189,6 +144,19 @@ const Home = ({
       </ThemeProvider>
     </div>
   );
+};
+
+Home.propTypes = {
+  transactions: PropTypes.array,
+  next: PropTypes.string,
+  nextUrl: PropTypes.string,
+  rowsCount: PropTypes.number.isRequired
+};
+
+Home.defaultProps = {
+  transactions: [],
+  next: null,
+  nextUrl: null
 };
 
 export default Home;
