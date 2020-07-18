@@ -5,7 +5,7 @@ import Router, { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import 'nprogress/nprogress.css'; // styles of nprogress
-import { Heading, ThemeProvider, theme } from '@chakra-ui/core';
+import { Heading, ThemeProvider, theme, CSSReset } from '@chakra-ui/core';
 
 // Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -39,6 +39,7 @@ const App = ({ Component, pageProps }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ThemeProvider theme={theme}>
+        <CSSReset />
         {loading ? <Heading>Loading..</Heading> : <Component {...pageProps} />}
       </ThemeProvider>
     </>

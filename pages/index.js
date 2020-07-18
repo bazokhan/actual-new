@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-import NextLink from 'next/link';
-import { List, ListItem, Heading, Avatar, Tag, Link } from '@chakra-ui/core';
+import { List, ListItem, Heading, Avatar, Tag } from '@chakra-ui/core';
 import { query, SHAPES } from '../libs/query';
+import Link from '../components/Link';
 
 export const getServerSideProps = async () => {
   try {
@@ -27,13 +27,11 @@ const Home = ({ accounts }) => {
     <List>
       {accounts?.map?.((account) => (
         <ListItem key={account.id}>
-          <NextLink href={`/${account.id}`}>
-            <Link as="a">
-              <Avatar name={account?.name} src={account?.image} />
-              <Heading>{account?.name}</Heading>
-              <Tag>{account?.type}</Tag>
-            </Link>
-          </NextLink>
+          <Link href={`/${account.id}`}>
+            <Avatar name={account?.name} src={account?.image} />
+            <Heading>{account?.name}</Heading>
+            <Tag>{account?.type}</Tag>
+          </Link>
         </ListItem>
       ))}
     </List>

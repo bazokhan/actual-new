@@ -1,26 +1,12 @@
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import {
-  Heading,
-  ThemeProvider,
-  theme,
-  Button,
-  CSSReset
-} from '@chakra-ui/core';
-import { useState, useEffect } from 'react';
-import { TYPES, query, SHAPES, rawQuery } from '../../libs/query';
+import { Heading, Button } from '@chakra-ui/core';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { TYPES, query, rawQuery } from '../../libs/query';
 
 import { Table, TBody, TBodyTR, TBodyTD } from '../../components/Table/Table';
+import Link from '../../components/Link';
 
-export const getServerSidePaths = async () => {
-  const { accounts } = await query('accounts', {
-    shape: SHAPES.ARRAY
-  });
-  return {
-    paths: accounts?.map((account) => `/${account.id}`) || [],
-    fallback: false
-  };
-};
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
     const { data, next, nextUrl, rowsCount } = await query('transactions', {
@@ -46,47 +32,42 @@ export const getServerSideProps = async ({ params: { account } }) => {
   }
 };
 
-// const usePagination = () => {};
-
-const Home = ({
-  transactions: initialTransactions,
-  next: initialNext,
-  nextUrl: initialUrl,
-  rowsCount
-}) => {
+const usePagination = ({ data, initialNext, initialUrl, rowsCount }) => {
   const [index, setIndex] = useState(0);
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const [dataState, setDataState] = useState(data);
   const [next, setNext] = useState(initialNext);
   const [nextUrl, setNextUrl] = useState(initialUrl);
-  const [activeTransactions, setActiveTransactions] = useState(
-    initialTransactions
-  );
+  const [activePageData, setActivePageData] = useState(data);
 
-  const fetchMore = async () => {
+  const fetchMore = useCallback(async () => {
     try {
-      const { data, next: newNext, next_url: newUrl } = await rawQuery(nextUrl);
-      if (data) {
-        setTransactions([...transactions, ...data]);
+      const {
+        data: fetchMoreData,
+        next: newNext,
+        nextUrl: newUrl
+      } = await rawQuery(nextUrl);
+      if (fetchMoreData) {
+        setDataState([...dataState, ...fetchMoreData]);
       }
       setNext(newNext);
       setNextUrl(newUrl);
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [dataState, nextUrl]);
 
-  const getNextPage = async () => {
+  const getNextPage = useCallback(async () => {
     const newIndex = index + 1;
     const targetDataLength = newIndex * 100 + 100;
-    if (next && transactions.length <= targetDataLength) {
+    if (next && dataState.length <= targetDataLength) {
       await fetchMore();
     }
     setIndex(newIndex);
-  };
+  }, [index, next, dataState.length, fetchMore]);
 
-  const getPrevPage = async () => {
+  const getPrevPage = useCallback(async () => {
     setIndex(index - 1);
-  };
+  }, [index]);
 
   const getFirstPage = async () => {
     setIndex(0);
@@ -95,10 +76,59 @@ const Home = ({
   const getLastPage = async () => {
     setIndex(Math.floor(rowsCount / 100));
   };
+  const pageNumber = useMemo(() => index + 1, [index]);
 
   useEffect(() => {
-    setActiveTransactions(transactions.slice(index * 100, (index + 1) * 100));
-  }, [index, transactions]);
+    setActivePageData(
+      dataState
+        .map((t, originalIndex) => ({ ...t, index: originalIndex }))
+        .slice(index * 100, (index + 1) * 100)
+    );
+  }, [index, dataState]);
+
+  const disableNextPageButton = useMemo(() => index * 100 + 100 >= rowsCount, [
+    index,
+    rowsCount
+  ]);
+  const disablePrevPageButton = useMemo(() => index <= 0, [index]);
+  const isFirstPage = useMemo(() => index === 0, [index]);
+  const isLastPage = useMemo(() => index === Math.floor(rowsCount / 100), [
+    index,
+    rowsCount
+  ]);
+
+  return {
+    activePageData,
+    pageNumber,
+    disableNextPageButton,
+    disablePrevPageButton,
+    isFirstPage,
+    isLastPage,
+    getLastPage,
+    getFirstPage,
+    getPrevPage,
+    getNextPage
+  };
+};
+
+const Home = ({ transactions, next, nextUrl, rowsCount }) => {
+  const {
+    activePageData,
+    pageNumber,
+    getLastPage,
+    getFirstPage,
+    getPrevPage,
+    getNextPage,
+    disableNextPageButton,
+    disablePrevPageButton,
+    isFirstPage,
+    isLastPage
+  } = usePagination({
+    data: transactions,
+    initialNext: next,
+    initialUrl: nextUrl,
+    rowsCount
+  });
 
   return (
     <div>
@@ -106,42 +136,34 @@ const Home = ({
         <title>Account</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ThemeProvider theme={theme}>
-        <CSSReset />
-        <Heading as="h2">
-          {activeTransactions?.length} transactions of {rowsCount} total
-          transactions
-        </Heading>
-        <Heading as="h6">page number {index + 1}</Heading>
-        <Button
-          isDisabled={index * 100 + 100 >= rowsCount}
-          onClick={getNextPage}
-        >
-          Next
-        </Button>
-        <Button isDisabled={index <= 0} onClick={getPrevPage}>
-          Previous
-        </Button>
-        <Button isDisabled={index === 0} onClick={getFirstPage}>
-          First Page
-        </Button>
-        <Button
-          isDisabled={index === Math.floor(rowsCount / 100)}
-          onClick={getLastPage}
-        >
-          Last Page
-        </Button>
-        <Table>
-          <TBody>
-            {activeTransactions?.map?.((transaction) => (
-              <TBodyTR key={transaction.id}>
-                <TBodyTD>{transaction?.amount}</TBodyTD>
-                <TBodyTD>{transaction?.category || 'Uncategorized'}</TBodyTD>
-              </TBodyTR>
-            ))}
-          </TBody>
-        </Table>
-      </ThemeProvider>
+      <Link href="/">Home</Link>
+      <Heading as="h2">
+        {activePageData?.length} transactions of {rowsCount} total transactions
+      </Heading>
+      <Heading as="h6">page number {pageNumber}</Heading>
+      <Button isDisabled={disableNextPageButton} onClick={getNextPage}>
+        Next
+      </Button>
+      <Button isDisabled={disablePrevPageButton} onClick={getPrevPage}>
+        Previous
+      </Button>
+      <Button isDisabled={isFirstPage} onClick={getFirstPage}>
+        First Page
+      </Button>
+      <Button isDisabled={isLastPage} onClick={getLastPage}>
+        Last Page
+      </Button>
+      <Table>
+        <TBody>
+          {activePageData?.map?.((transaction) => (
+            <TBodyTR key={transaction.id}>
+              <TBodyTD>{(transaction.index + 1).toString()}</TBodyTD>
+              <TBodyTD>{transaction.amount}</TBodyTD>
+              <TBodyTD>{transaction.category || 'Uncategorized'}</TBodyTD>
+            </TBodyTR>
+          ))}
+        </TBody>
+      </Table>
     </div>
   );
 };
