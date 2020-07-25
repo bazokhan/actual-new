@@ -1,17 +1,19 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
-import { TYPES, query } from '../../libs/query';
-import prefetch from '../../libs/prefetch';
-import Link from '../../components/Link';
-import TransactionsTable from '../../components/TransactionsTable';
+import { TYPES, query } from '../../../libs/query';
+import prefetch from '../../../libs/prefetch';
+import Link from '../../../components/Link';
+import TransactionsTable from '../../../components/TransactionsTable';
 
-export const getServerSideProps = async ({ params: { account } }) => {
+export const getServerSideProps = async ({ params: { account, category } }) => {
   try {
     const { data, next, nextUrl, rowsCount } = await query('transactions', {
       where: [
         { column: 'acct', type: TYPES.EXACT, value: account },
+        { column: 'category', type: TYPES.EXACT, value: category },
         { column: 'tombstone', type: TYPES.EXACT, value: 0 }
       ]
     });
@@ -47,7 +49,7 @@ const Home = ({
   payees
 }) => {
   const {
-    query: { account: accountid }
+    query: { account: accountid, category: categoryid }
   } = useRouter();
 
   return (
@@ -58,7 +60,9 @@ const Home = ({
       </Head>
       <Link href="/">Home</Link>
       <Heading>
-        {accounts?.find((a) => a?.id === accountid)?.name || 'Unknown Account'}
+        {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
+        {categories?.find((c) => c.id === categoryid)?.name ||
+          'Unknown Category'}
       </Heading>
       <TransactionsTable
         accounts={accounts}
@@ -68,7 +72,6 @@ const Home = ({
         transactions={transactions}
         next={next}
         nextUrl={nextUrl}
-        linkCategory
       />
     </Grid>
   );

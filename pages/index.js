@@ -26,8 +26,8 @@ const Home = ({ accounts }) => {
   return (
     <List>
       {accounts?.map?.((account) => (
-        <ListItem key={account.id}>
-          <Link href={`/${account.id}`}>
+        <ListItem key={account?.id}>
+          <Link href={`/${account?.id}`}>
             <Avatar name={account?.name} src={account?.image} />
             <Heading>{account?.name}</Heading>
             <Tag>{account?.type}</Tag>

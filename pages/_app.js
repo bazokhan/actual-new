@@ -5,7 +5,7 @@ import Router, { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import 'nprogress/nprogress.css'; // styles of nprogress
-import { Heading, ThemeProvider, theme, CSSReset } from '@chakra-ui/core';
+import { Heading, ThemeProvider, theme, CSSReset, Grid } from '@chakra-ui/core';
 
 // Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -33,7 +33,12 @@ const App = ({ Component, pageProps }) => {
     };
   });
   return (
-    <>
+    <Grid
+      overflowY="hidden"
+      height="100vh"
+      alignContent="start"
+      columnGap="10px"
+    >
       <Head>
         <title>Actual</title>
         <link rel="icon" href="/favicon.ico" />
@@ -42,7 +47,7 @@ const App = ({ Component, pageProps }) => {
         <CSSReset />
         {loading ? <Heading>Loading..</Heading> : <Component {...pageProps} />}
       </ThemeProvider>
-    </>
+    </Grid>
   );
 };
 

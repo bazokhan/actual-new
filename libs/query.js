@@ -128,3 +128,25 @@ export const query = async (
     return { error, data: null };
   }
 };
+
+export const loadAll = async (data, next, nextUrl) => {
+  try {
+    if (!next) return { data };
+    const {
+      data: fetchMoreData,
+      next: newNext,
+      nextUrl: newUrl
+    } = await rawQuery(nextUrl);
+    if (!fetchMoreData) return { data };
+    if (fetchMoreData && !newNext) {
+      return { data: [...data, ...fetchMoreData] };
+    }
+    if (fetchMoreData && newNext) {
+      return await loadAll([...data, ...fetchMoreData], newNext, newUrl);
+    }
+    return { data };
+  } catch (err) {
+    console.log(err);
+    return { data };
+  }
+};
