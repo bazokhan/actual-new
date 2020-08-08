@@ -11,9 +11,9 @@ const prefetch = async () => {
     const { data: payees } = await query('payees', {
       where: [{ column: 'tombstone', type: TYPES.EXACT, value: 0 }]
     });
-    console.log(accounts);
     return { accounts, categories, payees };
-  } catch {
+  } catch (err) {
+    console.log(err);
     return {
       accounts: [],
       categories: [],

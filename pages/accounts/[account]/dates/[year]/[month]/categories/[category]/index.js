@@ -3,17 +3,29 @@ import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
-import { TYPES, query } from '../../../libs/query';
-import prefetch from '../../../libs/prefetch';
-import Link from '../../../components/Link';
-import TransactionsTable from '../../../components/TransactionsTable';
+import { TYPES, query } from 'libs/query';
+import prefetch from 'libs/prefetch';
+import Link from 'components/Link';
+import TransactionsTable from 'components/TransactionsTable';
 
-export const getServerSideProps = async ({ params: { account, category } }) => {
+export const getServerSideProps = async ({
+  params: { account, year, month, category }
+}) => {
   try {
     const { data, next, nextUrl, rowsCount } = await query('transactions', {
       where: [
         { column: 'acct', type: TYPES.EXACT, value: account },
         { column: 'category', type: TYPES.EXACT, value: category },
+        {
+          column: 'date',
+          type: TYPES.GTE,
+          value: Number(year) * 10000 + Number(month) * 100
+        },
+        {
+          column: 'date',
+          type: TYPES.LT,
+          value: Number(year) * 10000 + (Number(month) + 1) * 100
+        },
         { column: 'tombstone', type: TYPES.EXACT, value: 0 }
       ]
     });
@@ -49,8 +61,10 @@ const Home = ({
   payees
 }) => {
   const {
-    query: { account: accountid, category: categoryid }
+    query: { account: accountid, category: categoryid, year, month }
   } = useRouter();
+
+  const account = accounts.find((a) => a.id === accountid);
 
   return (
     <Grid overflowY="hidden">
@@ -61,10 +75,15 @@ const Home = ({
       <Link href="/">Home</Link>
       <Heading>
         {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
+        {year}/{month}/
         {categories?.find((c) => c.id === categoryid)?.name ||
           'Unknown Category'}
       </Heading>
+      <Link href={`/accounts/${accountid}/dates/${year}/${month}/categories`}>
+        All Categories of this month
+      </Link>
       <TransactionsTable
+        account={account}
         accounts={accounts}
         categories={categories}
         payees={payees}

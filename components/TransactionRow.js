@@ -12,7 +12,7 @@ const TransactionRow = ({
 }) => (
   <Grid
     key={transaction.id}
-    gridTemplateColumns="60px 1fr 1fr 1fr 1fr"
+    gridTemplateColumns="60px 1fr 1fr 1fr 1fr 1fr"
     bg={index % 2 === 0 ? '#eee' : '#fff'}
   >
     <Text p="10px" borderRight="solid 1px #333" textAlign="center">
@@ -30,7 +30,7 @@ const TransactionRow = ({
       textAlign="right"
       borderRight="solid 1px #333"
     >
-      {transaction.amount}
+      {`${(transaction.amount / 100).toFixed(2)} EGP`}
     </Text>
     <Text
       p="10px 20px 10px 10px"
@@ -40,14 +40,21 @@ const TransactionRow = ({
       {payee?.name || 'No Payee'}
     </Text>
     {linkCategory && account && category ? (
-      <Link href={`/${account.id}/${category.id}`} textAlign="right">
+      <Link
+        href={`/accounts/${account.id}/categories/${category.id}`}
+        textAlign="right"
+        borderRight="solid 1px #333"
+      >
         {category.name}
       </Link>
     ) : (
-      <Text p="10px" textAlign="right">
+      <Text p="10px" textAlign="right" borderRight="solid 1px #333">
         {category?.name || 'Uncategorized'}
       </Text>
     )}
+    <Text p="10px" textAlign="right">
+      {transaction?.date || 'undated'}
+    </Text>
   </Grid>
 );
 
@@ -56,7 +63,8 @@ TransactionRow.propTypes = {
   transaction: PropTypes.shape({
     id: PropTypes.string,
     index: PropTypes.number,
-    amount: PropTypes.number
+    amount: PropTypes.number,
+    date: PropTypes.number
   }).isRequired,
   account: PropTypes.shape({
     id: PropTypes.string,

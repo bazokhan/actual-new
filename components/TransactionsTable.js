@@ -13,7 +13,8 @@ const TransactionsTable = ({
   categories,
   payees,
   rowsCount,
-  linkCategory
+  linkCategory,
+  account
 }) => {
   const [tableSize, setTableSize] = useState(50);
 
@@ -60,7 +61,7 @@ const TransactionsTable = ({
       m="10px 40px"
       overflowY="hidden"
     >
-      <TransactionHeader />
+      <TransactionHeader account={account} />
       <Grid overflowY="auto">
         {activePageData?.map?.((transaction, index) => {
           const account = accounts?.find((a) => a?.id === transaction.acct);

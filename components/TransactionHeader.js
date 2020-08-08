@@ -1,7 +1,8 @@
 import { Grid, Text } from '@chakra-ui/core';
+import Link from 'components/Link';
 
-const TransactionHeader = () => (
-  <Grid gridTemplateColumns="60px 1fr 1fr 1fr 1fr">
+const TransactionHeader = ({ account }) => (
+  <Grid gridTemplateColumns="60px 1fr 1fr 1fr 1fr 1fr">
     <Text p="10px" borderRight="solid 1px #333" textAlign="center">
       #
     </Text>
@@ -22,9 +23,16 @@ const TransactionHeader = () => (
     >
       Payee
     </Text>
-    <Text p="10px" textAlign="center">
-      Category
-    </Text>
+    <Link href={`/accounts/${account?.id}/categories`}>
+      <Text p="10px" textAlign="center" borderRight="solid 1px #333">
+        Category
+      </Text>
+    </Link>
+    <Link href={`/accounts/${account?.id}/dates`}>
+      <Text p="10px" textAlign="center">
+        Date
+      </Text>
+    </Link>
   </Grid>
 );
 
