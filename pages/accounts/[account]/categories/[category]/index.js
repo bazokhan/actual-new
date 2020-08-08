@@ -66,6 +66,9 @@ const Home = ({
         {categories?.find((c) => c.id === categoryid)?.name ||
           'Unknown Category'}
       </Heading>
+      <Link href={`/accounts/${accountid}/categories/${categoryid}/timeline`}>
+        Timeline
+      </Link>
       <TransactionsTable
         account={account}
         accounts={accounts}

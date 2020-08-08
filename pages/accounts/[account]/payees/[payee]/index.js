@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { Grid, Heading } from '@chakra-ui/core';
@@ -7,11 +8,12 @@ import prefetch from 'libs/prefetch';
 import Link from 'components/Link';
 import TransactionsTable from 'components/TransactionsTable';
 
-export const getServerSideProps = async ({ params: { account } }) => {
+export const getServerSideProps = async ({ params: { account, payee } }) => {
   try {
     const { data, next, nextUrl, rowsCount } = await query('transactions', {
       where: [
         { column: 'acct', type: TYPES.EXACT, value: account },
+        { column: 'description', type: TYPES.EXACT, value: payee },
         { column: 'tombstone', type: TYPES.EXACT, value: 0 }
       ]
     });
@@ -37,7 +39,7 @@ export const getServerSideProps = async ({ params: { account } }) => {
   }
 };
 
-const Account = ({
+const Home = ({
   transactions,
   next,
   nextUrl,
@@ -47,10 +49,10 @@ const Account = ({
   payees
 }) => {
   const {
-    query: { account: accountid }
+    query: { account: accountid, payee: payeeid }
   } = useRouter();
 
-  const account = accounts?.find((a) => a?.id === accountid);
+  const account = accounts.find((a) => a.id === accountid);
 
   return (
     <Grid overflowY="hidden">
@@ -59,9 +61,12 @@ const Account = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Link href="/">Home</Link>
-      <Link href="/accounts">Accounts</Link>
-      <Link href={`/accounts/${accountid}`}>
-        <Heading>{account?.name || 'Unknown Account'}</Heading>
+      <Heading>
+        {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
+        {payees?.find((c) => c.id === payeeid)?.name || 'Unknown Payee'}
+      </Heading>
+      <Link href={`/accounts/${accountid}/payees/${payeeid}/timeline`}>
+        Timeline
       </Link>
       <TransactionsTable
         account={account}
@@ -72,14 +77,12 @@ const Account = ({
         transactions={transactions}
         next={next}
         nextUrl={nextUrl}
-        linkCategory
-        linkPayee
       />
     </Grid>
   );
 };
 
-Account.propTypes = {
+Home.propTypes = {
   transactions: PropTypes.array,
   next: PropTypes.string,
   nextUrl: PropTypes.string,
@@ -89,7 +92,7 @@ Account.propTypes = {
   payees: PropTypes.array
 };
 
-Account.defaultProps = {
+Home.defaultProps = {
   transactions: [],
   next: null,
   nextUrl: null,
@@ -98,4 +101,4 @@ Account.defaultProps = {
   payees: []
 };
 
-export default Account;
+export default Home;

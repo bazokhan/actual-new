@@ -14,6 +14,7 @@ const TransactionsTable = ({
   payees,
   rowsCount,
   linkCategory,
+  linkPayee,
   account
 }) => {
   const [tableSize, setTableSize] = useState(50);
@@ -64,7 +65,7 @@ const TransactionsTable = ({
       <TransactionHeader account={account} />
       <Grid overflowY="auto">
         {activePageData?.map?.((transaction, index) => {
-          const account = accounts?.find((a) => a?.id === transaction.acct);
+          const acc = accounts?.find((a) => a?.id === transaction.acct);
           const payee = payees?.find((p) => p?.id === transaction.description);
           const category = categories?.find(
             (c) => c?.id === transaction.category
@@ -75,10 +76,11 @@ const TransactionsTable = ({
               key={transaction?.id}
               index={index}
               transaction={transaction}
-              account={account}
+              account={acc}
               category={category}
               payee={payee}
               linkCategory={linkCategory}
+              linkPayee={linkPayee}
             />
           );
         })}

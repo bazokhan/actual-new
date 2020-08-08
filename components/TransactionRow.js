@@ -8,7 +8,8 @@ const TransactionRow = ({
   account,
   category,
   payee,
-  linkCategory
+  linkCategory,
+  linkPayee
 }) => (
   <Grid
     key={transaction.id}
@@ -32,13 +33,23 @@ const TransactionRow = ({
     >
       {`${(transaction.amount / 100).toFixed(2)} EGP`}
     </Text>
-    <Text
-      p="10px 20px 10px 10px"
-      textAlign="right"
-      borderRight="solid 1px #333"
-    >
-      {payee?.name || 'No Payee'}
-    </Text>
+    {linkPayee && account && payee ? (
+      <Link
+        href={`/accounts/${account.id}/payees/${payee.id}`}
+        textAlign="right"
+        borderRight="solid 1px #333"
+      >
+        {payee.name}
+      </Link>
+    ) : (
+      <Text
+        p="10px 20px 10px 10px"
+        textAlign="right"
+        borderRight="solid 1px #333"
+      >
+        {payee?.name || 'No Payee'}
+      </Text>
+    )}
     {linkCategory && account && category ? (
       <Link
         href={`/accounts/${account.id}/categories/${category.id}`}
@@ -78,14 +89,16 @@ TransactionRow.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string
   }),
-  linkCategory: PropTypes.bool
+  linkCategory: PropTypes.bool,
+  linkPayee: PropTypes.bool
 };
 
 TransactionRow.defaultProps = {
   account: null,
   category: null,
   payee: null,
-  linkCategory: false
+  linkCategory: false,
+  linkPayee: false
 };
 
 export default TransactionRow;
