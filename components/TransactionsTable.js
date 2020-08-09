@@ -1,5 +1,13 @@
 import PropTypes from 'prop-types';
-import { Grid, Button, Text, Select, FormLabel, Flex } from '@chakra-ui/core';
+import {
+  Grid,
+  Button,
+  Text,
+  Select,
+  FormLabel,
+  Flex,
+  Box
+} from '@chakra-ui/core';
 import { useEffect, useState } from 'react';
 import TransactionHeader from './TransactionHeader';
 import TransactionRow from './TransactionRow';
@@ -78,6 +86,7 @@ const TransactionsTable = ({
               transaction={transaction}
               account={acc}
               category={category}
+              alignSelf="start"
               // Special for payee only
               payee={{
                 ...payee,
@@ -90,6 +99,7 @@ const TransactionsTable = ({
             />
           );
         })}
+        <Box alignSelf="stretch" />
       </Grid>
       <Flex
         direction="column"

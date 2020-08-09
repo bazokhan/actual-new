@@ -32,13 +32,15 @@ const TransactionRow = ({
   category,
   payee,
   linkCategory,
-  linkPayee
+  linkPayee,
+  ...props
 }) => (
   <Grid
     key={transaction.id}
     gridTemplateColumns="60px 1fr 1fr 1fr 1fr 1fr"
     alignItems="center"
     bg={index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : '#fff'}
+    {...props}
   >
     <TableText>
       {transaction.index + 1 ? (transaction.index + 1).toString() : '-'}
