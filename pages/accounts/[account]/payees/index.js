@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading, Text, Avatar, Flex } from '@chakra-ui/core';
+import { Flex } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query, loadAll } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
+import { getPayees } from 'libs/transactions';
+import TransactionFieldCard from 'components/TransactionsFieldCard';
 
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
@@ -18,23 +20,12 @@ export const getServerSideProps = async ({ params: { account } }) => {
 
     const { data: allTransactions } = await loadAll(data, next, nextUrl);
 
-    const { accounts, payees } = await prefetch();
+    const { accounts, payees, categories } = await prefetch();
     return {
       props: {
         accounts,
-        payees: (
-          allTransactions?.reduce((prev, t) => {
-            const payee = payees?.find((p) => t.description === p.id) || null;
-            if (!payee || prev?.find((p) => p?.id === payee?.id)) {
-              return prev;
-            }
-            return [...prev, payee];
-          }, []) || []
-        ).map((p) => ({
-          ...p,
-          transactions:
-            allTransactions?.filter((t) => t.description === p.id) || []
-        }))
+        categories,
+        payees: getPayees(allTransactions, payees)
       }
     };
   } catch {
@@ -47,62 +38,60 @@ export const getServerSideProps = async ({ params: { account } }) => {
   }
 };
 
-const Home = ({ accounts, payees }) => {
+const Payees = ({ accounts, payees, categories }) => {
   const {
     query: { account: accountid }
   } = useRouter();
 
+  const account = accounts?.find((a) => a.id === accountid);
+
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Link href={`/accounts/${accountid}`}>
-        <Heading>
-          {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}
-          /
-        </Heading>
-      </Link>
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title="Payees"
+        sections={[
+          { url: '', name: 'Transactions' },
+          { url: 'categories', name: 'Categories' },
+          { url: 'revision', name: 'Revision' },
+          { url: 'dates', name: 'By Date' }
+        ]}
+      />
       <Flex wrap="wrap" overflowY="auto">
-        {payees?.map((payee) => (
-          <Link
-            margin="10px"
-            p="20px"
-            d="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            border="solid 1px #333"
-            borderRadius="5px"
-            key={payee.id}
-            href={`/accounts/${accountid}/payees/${payee.id}`}
-          >
-            <Avatar name={payee?.name} src={payee?.image} />
-            <Text>{payee.name}</Text>
-            <Text>{payee.transactions.length} transactions</Text>
-            <Text>
-              {(
-                payee.transactions.reduce((prev, t) => prev + t.amount, 0) / 100
-              ).toFixed(2)}{' '}
-              EGP
-            </Text>
-          </Link>
-        ))}
+        {payees?.map((payee) => {
+          // Special for payee only
+          const transferAccount = accounts?.find(
+            (a) => a.id === payee.transfer_acct
+          );
+          return (
+            <TransactionFieldCard
+              key={payee.id}
+              name={payee?.name || transferAccount?.name || 'Unknown Payee'}
+              url={`/accounts/${accountid}/payees/${payee.id}`}
+              transactions={payee.transactions}
+              transactionsTableProps={{ account, accounts, categories, payees }}
+            />
+          );
+        })}
       </Flex>
-    </Grid>
+    </MainLayout>
   );
 };
 
-Home.propTypes = {
+Payees.propTypes = {
   accounts: PropTypes.array,
-  payees: PropTypes.array
+  payees: PropTypes.array,
+  categories: PropTypes.array
 };
 
-Home.defaultProps = {
+Payees.defaultProps = {
   accounts: [],
-  payees: []
+  payees: [],
+  categories: []
 };
 
-export default Home;
+export default Payees;

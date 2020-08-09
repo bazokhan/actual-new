@@ -1,6 +1,29 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { Grid, Text } from '@chakra-ui/core';
 import PropTypes from 'prop-types';
 import Link from './Link';
+import MoneyText from './MoneyText';
+import DateText from './DateText';
+
+const TableText = ({ children, ...props }) => (
+  <Text
+    d="flex"
+    justifyContent="flex-end"
+    alignItems="center"
+    p="5px 10px"
+    borderRight="solid 1px #eee"
+    textAlign="right"
+    color="gray.700"
+    fontSize="15px"
+    {...props}
+  >
+    {children}
+  </Text>
+);
+
+TableText.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
 const TransactionRow = ({
   index,
@@ -14,58 +37,35 @@ const TransactionRow = ({
   <Grid
     key={transaction.id}
     gridTemplateColumns="60px 1fr 1fr 1fr 1fr 1fr"
-    bg={index % 2 === 0 ? '#eee' : '#fff'}
+    alignItems="center"
+    bg={index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : '#fff'}
   >
-    <Text p="10px" borderRight="solid 1px #333" textAlign="center">
+    <TableText>
       {transaction.index + 1 ? (transaction.index + 1).toString() : '-'}
-    </Text>
-    <Text
-      p="10px 20px 10px 10px"
-      textAlign="right"
-      borderRight="solid 1px #333"
-    >
-      {account?.name || 'No Account'}
-    </Text>
-    <Text
-      p="10px 20px 10px 10px"
-      textAlign="right"
-      borderRight="solid 1px #333"
-    >
-      {`${(transaction.amount / 100).toFixed(2)} EGP`}
-    </Text>
+    </TableText>
+    <TableText>{account?.name || 'No Account'}</TableText>
+    <MoneyText amount={transaction.amount || 0} />
     {linkPayee && account && payee ? (
-      <Link
-        href={`/accounts/${account.id}/payees/${payee.id}`}
-        textAlign="right"
-        borderRight="solid 1px #333"
-      >
-        {payee.name}
+      <Link href={`/accounts/${account.id}/payees/${payee.id}`}>
+        <TableText>
+          {/* Special for payee only */}
+          {payee.name || payee.transferAccount?.name || 'Unknown Payee'}
+        </TableText>
       </Link>
     ) : (
-      <Text
-        p="10px 20px 10px 10px"
-        textAlign="right"
-        borderRight="solid 1px #333"
-      >
-        {payee?.name || 'No Payee'}
-      </Text>
+      <TableText>
+        {/* Special for payee only */}
+        {payee.name || payee.transferAccount?.name || 'Unknown Payee'}
+      </TableText>
     )}
     {linkCategory && account && category ? (
-      <Link
-        href={`/accounts/${account.id}/categories/${category.id}`}
-        textAlign="right"
-        borderRight="solid 1px #333"
-      >
-        {category.name}
+      <Link href={`/accounts/${account.id}/categories/${category.id}`}>
+        <TableText>{category.name}</TableText>
       </Link>
     ) : (
-      <Text p="10px" textAlign="right" borderRight="solid 1px #333">
-        {category?.name || 'Uncategorized'}
-      </Text>
+      <TableText>{category?.name || 'Uncategorized'}</TableText>
     )}
-    <Text p="10px" textAlign="right">
-      {transaction?.date || 'undated'}
-    </Text>
+    <DateText date={transaction?.date} />
   </Grid>
 );
 
@@ -87,7 +87,11 @@ TransactionRow.propTypes = {
   }),
   payee: PropTypes.shape({
     id: PropTypes.string,
-    name: PropTypes.string
+    name: PropTypes.string,
+    transferAccount: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string
+    })
   }),
   linkCategory: PropTypes.bool,
   linkPayee: PropTypes.bool

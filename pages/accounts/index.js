@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
-import { List, ListItem, Heading, Avatar, Tag } from '@chakra-ui/core';
+import { Heading, Avatar, Tag, Flex } from '@chakra-ui/core';
 import { query, SHAPES } from 'libs/query';
 import Link from 'components/Link';
+import MainLayout from 'layouts/MainLayout';
 
 export const getServerSideProps = async () => {
   try {
@@ -24,17 +25,38 @@ export const getServerSideProps = async () => {
 
 const Accounts = ({ accounts }) => {
   return (
-    <List>
-      {accounts?.map?.((account) => (
-        <ListItem key={account?.id}>
-          <Link href={`/accounts/${account?.id}`}>
+    <MainLayout
+      title="Accounts"
+      accounts={accounts}
+      alignItems="start"
+      gridAutoRows="auto 1fr"
+    >
+      <Heading fontSize="20px" p="10px">
+        All Accounts
+      </Heading>
+      <Flex wrap="wrap" alignItems="flex-start">
+        {accounts?.map?.((account) => (
+          <Link
+            key={account.id}
+            href={`/accounts/${account?.id}`}
+            m="10px"
+            d="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="start"
+            borderRadius="5px"
+            padding="10px 20px"
+            boxShadow="0 3px 3px 0 rgba(0, 0, 0, 0.16)"
+          >
             <Avatar name={account?.name} src={account?.image} />
-            <Heading>{account?.name}</Heading>
+            <Heading fontSize="20px" my="10px">
+              {account?.name}
+            </Heading>
             <Tag>{account?.type}</Tag>
           </Link>
-        </ListItem>
-      ))}
-    </List>
+        ))}
+      </Flex>
+    </MainLayout>
   );
 };
 

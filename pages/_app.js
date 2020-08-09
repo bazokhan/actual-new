@@ -5,7 +5,15 @@ import Router, { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import 'nprogress/nprogress.css'; // styles of nprogress
-import { Heading, ThemeProvider, theme, CSSReset, Grid } from '@chakra-ui/core';
+import {
+  ThemeProvider,
+  theme,
+  CSSReset,
+  Grid,
+  Spinner,
+  Flex
+} from '@chakra-ui/core';
+import MainLayout from 'layouts/MainLayout';
 
 // Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -45,7 +53,15 @@ const App = ({ Component, pageProps }) => {
       </Head>
       <ThemeProvider theme={theme}>
         <CSSReset />
-        {loading ? <Heading>Loading..</Heading> : <Component {...pageProps} />}
+        {loading ? (
+          <MainLayout justifyContent="stretch" alignItems="stretch">
+            <Flex justifyContent="center" alignItems="center">
+              <Spinner size="lg" color="blue.900" />
+            </Flex>
+          </MainLayout>
+        ) : (
+          <Component {...pageProps} />
+        )}
       </ThemeProvider>
     </Grid>
   );

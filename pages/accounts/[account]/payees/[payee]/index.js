@@ -1,12 +1,10 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
 import TransactionsTable from 'components/TransactionsTable';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
 
 export const getServerSideProps = async ({ params: { account, payee } }) => {
   try {
@@ -39,7 +37,7 @@ export const getServerSideProps = async ({ params: { account, payee } }) => {
   }
 };
 
-const Home = ({
+const Payee = ({
   transactions,
   next,
   nextUrl,
@@ -52,22 +50,26 @@ const Home = ({
     query: { account: accountid, payee: payeeid }
   } = useRouter();
 
-  const account = accounts.find((a) => a.id === accountid);
+  const account = accounts?.find((a) => a.id === accountid);
+  const payee = payees?.find((p) => p.id === payeeid);
+  // Special for payee only
+  const transferAccount = accounts?.find((a) => a.id === payee.transfer_acct);
+  const payeeName = payee?.name || transferAccount?.name || 'Unknown Payee';
 
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Heading>
-        {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
-        {payees?.find((c) => c.id === payeeid)?.name || 'Unknown Payee'}
-      </Heading>
-      <Link href={`/accounts/${accountid}/payees/${payeeid}/timeline`}>
-        Timeline
-      </Link>
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title={payeeName}
+        sections={[
+          { url: 'payees', name: 'All Payees' },
+          { url: `payees/${payee.id}/timeline`, name: 'Timeline' }
+        ]}
+      />
       <TransactionsTable
         account={account}
         accounts={accounts}
@@ -78,11 +80,11 @@ const Home = ({
         next={next}
         nextUrl={nextUrl}
       />
-    </Grid>
+    </MainLayout>
   );
 };
 
-Home.propTypes = {
+Payee.propTypes = {
   transactions: PropTypes.array,
   next: PropTypes.string,
   nextUrl: PropTypes.string,
@@ -92,7 +94,7 @@ Home.propTypes = {
   payees: PropTypes.array
 };
 
-Home.defaultProps = {
+Payee.defaultProps = {
   transactions: [],
   next: null,
   nextUrl: null,
@@ -101,4 +103,4 @@ Home.defaultProps = {
   payees: []
 };
 
-export default Home;
+export default Payee;

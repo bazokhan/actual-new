@@ -1,7 +1,12 @@
 import Link from 'components/Link';
+import MainLayout from 'layouts/MainLayout';
 
 const Home = () => {
-  return <Link href="/accounts">Accounts</Link>;
+  return (
+    <MainLayout>
+      <Link href="/accounts">Accounts</Link>
+    </MainLayout>
+  );
 };
 
 export default Home;

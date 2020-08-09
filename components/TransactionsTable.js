@@ -1,4 +1,5 @@
-import { Grid, Button, Text, Select, FormLabel } from '@chakra-ui/core';
+import PropTypes from 'prop-types';
+import { Grid, Button, Text, Select, FormLabel, Flex } from '@chakra-ui/core';
 import { useEffect, useState } from 'react';
 import TransactionHeader from './TransactionHeader';
 import TransactionRow from './TransactionRow';
@@ -56,11 +57,10 @@ const TransactionsTable = ({
 
   return (
     <Grid
-      p="20px"
-      border="solid 1px #333"
-      borderRadius="15px"
-      m="10px 40px"
+      border="solid 1px #eee"
+      borderRadius="5px"
       overflowY="hidden"
+      gridTemplateRows="auto 1fr"
     >
       <TransactionHeader account={account} />
       <Grid overflowY="auto">
@@ -78,57 +78,124 @@ const TransactionsTable = ({
               transaction={transaction}
               account={acc}
               category={category}
-              payee={payee}
+              // Special for payee only
+              payee={{
+                ...payee,
+                transferAccount: accounts?.find(
+                  (a) => a.id === payee.transfer_acct
+                )
+              }}
               linkCategory={linkCategory}
               linkPayee={linkPayee}
             />
           );
         })}
       </Grid>
-      <Grid
-        gridTemplateColumns="repeat(7, auto)"
+      <Flex
+        direction="column"
+        borderTop="solid 1px #eee"
+        paddingTop="5px"
         alignItems="center"
-        width="fit-content"
-        margin="0 auto"
       >
-        <Button isDisabled={isFirstPage} onClick={getFirstPage}>
-          First Page
-        </Button>
-        <Button isDisabled={disablePrevPageButton} onClick={getPrevPage}>
-          Previous
-        </Button>
-        <Text p="5px 20px">
-          {pageNumber} / {totalPagesNumber}
-        </Text>
-        <Button isDisabled={disableNextPageButton} onClick={getNextPage}>
-          Next
-        </Button>
-        <Button isDisabled={isLastPage} onClick={getLastPage}>
-          Last Page
-        </Button>
-        <FormLabel htmlFor="items">Show: </FormLabel>
-        <Select
-          name="items"
-          value={tableSize}
-          onChange={(e) => {
-            setTableSize(e.target.value);
-            getFirstPage();
-          }}
+        <Grid
+          gridTemplateColumns="repeat(7, auto)"
+          alignItems="center"
+          width="fit-content"
+          margin="0 auto"
         >
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-          <option value={200}>200</option>
-        </Select>
-      </Grid>
-      <Text margin="0 auto">
-        transactions from {activePageData?.[0]?.index + 1} to{' '}
-        {activePageData?.[activePageData.length - 1]?.index + 1} out of total{' '}
-        {rowsCount} transactions
-      </Text>
+          <Button
+            variant="ghost"
+            variantColor="blue"
+            isDisabled={isFirstPage}
+            onClick={getFirstPage}
+          >
+            First Page
+          </Button>
+          <Button
+            variant="ghost"
+            variantColor="blue"
+            isDisabled={disablePrevPageButton}
+            onClick={getPrevPage}
+          >
+            Previous
+          </Button>
+          <Text p="5px 20px">
+            {pageNumber} / {totalPagesNumber}
+          </Text>
+          <Button
+            variant="ghost"
+            variantColor="blue"
+            isDisabled={disableNextPageButton}
+            onClick={getNextPage}
+          >
+            Next
+          </Button>
+          <Button
+            variant="ghost"
+            variantColor="blue"
+            isDisabled={isLastPage}
+            onClick={getLastPage}
+          >
+            Last Page
+          </Button>
+          <FormLabel
+            paddingBottom="0"
+            htmlFor="items"
+            fontWeight="100"
+            fontSize="12px"
+          >
+            Show:
+          </FormLabel>
+          <Select
+            name="items"
+            value={tableSize}
+            onChange={(e) => {
+              setTableSize(e.target.value);
+              getFirstPage();
+            }}
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+            <option value={200}>200</option>
+          </Select>
+        </Grid>
+        <Text margin="0 auto 5px" fontSize="14px" color="gray.700">
+          transactions from {activePageData?.[0]?.index + 1} to{' '}
+          {activePageData?.[activePageData.length - 1]?.index + 1} out of total{' '}
+          {rowsCount} transactions
+        </Text>
+      </Flex>
     </Grid>
   );
+};
+
+TransactionsTable.propTypes = {
+  transactions: PropTypes.array,
+  next: PropTypes.string,
+  nextUrl: PropTypes.string,
+  accounts: PropTypes.array,
+  categories: PropTypes.array,
+  payees: PropTypes.array,
+  rowsCount: PropTypes.number,
+  linkCategory: PropTypes.bool,
+  linkPayee: PropTypes.bool,
+  account: PropTypes.shape({
+    id: PropTypes.string
+  }).isRequired
+};
+
+TransactionsTable.defaultProps = {
+  transactions: [],
+  next: null,
+  nextUrl: null,
+  accounts: [],
+  categories: [],
+  payees: [],
+  rowsCount: 0,
+  linkCategory: false,
+  linkPayee: false
 };
 
 export default TransactionsTable;

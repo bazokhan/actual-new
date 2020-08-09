@@ -1,12 +1,11 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query, loadAll } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
 import TransactionsTable from 'components/TransactionsTable';
+import { getCategories } from 'libs/transactions';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
 
 export const getServerSideProps = async ({
   params: { account, year, month }
@@ -37,20 +36,7 @@ export const getServerSideProps = async ({
         nextUrl,
         rowsCount,
         accounts,
-        categories: (
-          allTransactions?.reduce((prev, t) => {
-            const category =
-              categories?.find((c) => t.category === c.id) || null;
-            if (!category || prev?.find((c) => c?.id === category?.id)) {
-              return prev;
-            }
-            return [...prev, category];
-          }, []) || []
-        ).map((c) => ({
-          ...c,
-          transactions:
-            allTransactions?.filter((t) => t.category === c.id) || []
-        })),
+        categories: getCategories(allTransactions, categories),
         payees,
         year,
         month
@@ -84,19 +70,23 @@ const Home = ({
   const account = accounts.find((a) => a.id === accountid);
 
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Heading>
-        {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
-        {year}/{month}
-      </Heading>
-      <Link href={`/accounts/${accountid}/dates/${year}/${month}/categories`}>
-        By Category
-      </Link>
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title={`${month}-${year}`}
+        sections={[
+          { url: 'dates', name: 'All Years' },
+          { url: `dates/${year}`, name: `All Months of ${year}` },
+          {
+            url: `dates/${year}/${month}/categories`,
+            name: 'Categories of the month'
+          }
+        ]}
+      />
       <TransactionsTable
         account={account}
         accounts={accounts}
@@ -107,7 +97,7 @@ const Home = ({
         next={next}
         nextUrl={nextUrl}
       />
-    </Grid>
+    </MainLayout>
   );
 };
 

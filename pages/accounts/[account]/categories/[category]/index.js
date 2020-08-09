@@ -1,12 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
 import TransactionsTable from 'components/TransactionsTable';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
 
 export const getServerSideProps = async ({ params: { account, category } }) => {
   try {
@@ -39,7 +38,7 @@ export const getServerSideProps = async ({ params: { account, category } }) => {
   }
 };
 
-const Home = ({
+const Category = ({
   transactions,
   next,
   nextUrl,
@@ -53,22 +52,22 @@ const Home = ({
   } = useRouter();
 
   const account = accounts.find((a) => a.id === accountid);
+  const category = categories?.find((c) => c.id === categoryid);
 
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Heading>
-        {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
-        {categories?.find((c) => c.id === categoryid)?.name ||
-          'Unknown Category'}
-      </Heading>
-      <Link href={`/accounts/${accountid}/categories/${categoryid}/timeline`}>
-        Timeline
-      </Link>
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title={category.name || 'Uncategorized'}
+        sections={[
+          { url: 'categories', name: 'All Categories' },
+          { url: `categories/${category.id}/timeline`, name: 'Timeline' }
+        ]}
+      />
       <TransactionsTable
         account={account}
         accounts={accounts}
@@ -79,11 +78,11 @@ const Home = ({
         next={next}
         nextUrl={nextUrl}
       />
-    </Grid>
+    </MainLayout>
   );
 };
 
-Home.propTypes = {
+Category.propTypes = {
   transactions: PropTypes.array,
   next: PropTypes.string,
   nextUrl: PropTypes.string,
@@ -93,7 +92,7 @@ Home.propTypes = {
   payees: PropTypes.array
 };
 
-Home.defaultProps = {
+Category.defaultProps = {
   transactions: [],
   next: null,
   nextUrl: null,
@@ -102,4 +101,4 @@ Home.defaultProps = {
   payees: []
 };
 
-export default Home;
+export default Category;

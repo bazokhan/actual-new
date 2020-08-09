@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
 import TransactionsTable from 'components/TransactionsTable';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
 
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
@@ -53,16 +52,21 @@ const Account = ({
   const account = accounts?.find((a) => a?.id === accountid);
 
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Link href="/accounts">Accounts</Link>
-      <Link href={`/accounts/${accountid}`}>
-        <Heading>{account?.name || 'Unknown Account'}</Heading>
-      </Link>
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title="Transactions"
+        sections={[
+          { url: 'categories', name: 'Categories' },
+          { url: 'payees', name: 'Payees' },
+          { url: 'revision', name: 'Revision' },
+          { url: 'dates', name: 'By Date' }
+        ]}
+      />
       <TransactionsTable
         account={account}
         accounts={accounts}
@@ -75,7 +79,7 @@ const Account = ({
         linkCategory
         linkPayee
       />
-    </Grid>
+    </MainLayout>
   );
 };
 

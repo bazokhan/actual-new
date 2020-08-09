@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading, Text, Avatar, Flex } from '@chakra-ui/core';
+import { Flex } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query, loadAll } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
+import { getCategories } from 'libs/transactions';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
+import TransactionFieldCard from 'components/TransactionsFieldCard';
 
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
@@ -18,93 +20,73 @@ export const getServerSideProps = async ({ params: { account } }) => {
 
     const { data: allTransactions } = await loadAll(data, next, nextUrl);
 
-    const { accounts, categories } = await prefetch();
+    const { accounts, categories, payees } = await prefetch();
     return {
       props: {
         accounts,
-        categories: (
-          allTransactions?.reduce((prev, t) => {
-            const category =
-              categories?.find((c) => t.category === c.id) || null;
-            if (!category || prev?.find((c) => c?.id === category?.id)) {
-              return prev;
-            }
-            return [...prev, category];
-          }, []) || []
-        ).map((c) => ({
-          ...c,
-          transactions:
-            allTransactions?.filter((t) => t.category === c.id) || []
-        }))
+        payees,
+        categories: getCategories(allTransactions, categories)
       }
     };
   } catch {
     return {
       props: {
         categories: [],
+        payees: [],
         accounts: []
       }
     };
   }
 };
 
-const Home = ({ accounts, categories }) => {
+const Categories = ({ accounts, categories, payees }) => {
   const {
     query: { account: accountid }
   } = useRouter();
 
+  const account = accounts?.find((a) => a.id === accountid);
+
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Link href={`/accounts/${accountid}`}>
-        <Heading>
-          {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}
-          /
-        </Heading>
-      </Link>
-      <Flex wrap="wrap">
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title="Categories"
+        sections={[
+          { url: '', name: 'Transactions' },
+          { url: 'payees', name: 'Payees' },
+          { url: 'revision', name: 'Revision' },
+          { url: 'dates', name: 'By Date' }
+        ]}
+      />
+      <Flex wrap="wrap" overflowY="auto">
         {categories?.map((category) => (
-          <Link
-            margin="10px"
-            p="20px"
-            d="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            border="solid 1px #333"
-            borderRadius="5px"
+          <TransactionFieldCard
             key={category.id}
-            href={`/accounts/${accountid}/categories/${category.id}`}
-          >
-            <Avatar name={category?.name} src={category?.image} />
-            <Text>{category.name}</Text>
-            <Text>{category.transactions.length} transactions</Text>
-            <Text>
-              {(
-                category.transactions.reduce((prev, t) => prev + t.amount, 0) /
-                100
-              ).toFixed(2)}{' '}
-              EGP
-            </Text>
-          </Link>
+            name={category?.name || 'Uncategorized'}
+            url={`/accounts/${accountid}/categories/${category.id}`}
+            transactions={category.transactions}
+            transactionsTableProps={{ account, accounts, categories, payees }}
+          />
         ))}
       </Flex>
-    </Grid>
+    </MainLayout>
   );
 };
 
-Home.propTypes = {
+Categories.propTypes = {
   accounts: PropTypes.array,
+  payees: PropTypes.array,
   categories: PropTypes.array
 };
 
-Home.defaultProps = {
+Categories.defaultProps = {
   accounts: [],
+  payees: [],
   categories: []
 };
 
-export default Home;
+export default Categories;

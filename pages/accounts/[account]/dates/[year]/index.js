@@ -1,12 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { Grid, Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 import { TYPES, query } from 'libs/query';
 import prefetch from 'libs/prefetch';
-import Link from 'components/Link';
 import TransactionsTable from 'components/TransactionsTable';
+import MainLayout from 'layouts/MainLayout';
+import Navbar from 'components/Navbar';
 
 export const getServerSideProps = async ({ params: { account, year } }) => {
   try {
@@ -58,16 +57,16 @@ const Home = ({
   const account = accounts.find((a) => a.id === accountid);
 
   return (
-    <Grid overflowY="hidden">
-      <Head>
-        <title>Account</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Link href="/">Home</Link>
-      <Heading>
-        {accounts?.find((a) => a.id === accountid)?.name || 'Unknown Account'}/
-        {year}
-      </Heading>
+    <MainLayout
+      title={account?.name || 'Unknown Account'}
+      accounts={accounts}
+      gridAutoRows="auto 1fr"
+    >
+      <Navbar
+        account={account}
+        title={year}
+        sections={[{ url: 'dates', name: 'All Years' }]}
+      />
       <TransactionsTable
         account={account}
         accounts={accounts}
@@ -78,7 +77,7 @@ const Home = ({
         next={next}
         nextUrl={nextUrl}
       />
-    </Grid>
+    </MainLayout>
   );
 };
 
