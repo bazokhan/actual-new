@@ -59,7 +59,8 @@ const Categories = ({ accounts, categories, payees }) => {
           { url: '', name: 'Transactions' },
           { url: 'payees', name: 'Payees' },
           { url: 'revision', name: 'Revision' },
-          { url: 'dates', name: 'By Date' }
+          { url: 'dates', name: 'By Date' },
+          { url: 'balance', name: 'Balance Sheet' }
         ]}
       />
       <Flex wrap="wrap" overflowY="auto">

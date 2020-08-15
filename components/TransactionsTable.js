@@ -24,7 +24,8 @@ const TransactionsTable = ({
   rowsCount,
   linkCategory,
   linkPayee,
-  account
+  account,
+  skipList
 }) => {
   const [tableSize, setTableSize] = useState(50);
 
@@ -70,7 +71,7 @@ const TransactionsTable = ({
       overflowY="hidden"
       gridTemplateRows="auto 1fr"
     >
-      <TransactionHeader account={account} />
+      <TransactionHeader account={account} skipList={skipList} />
       <Grid overflowY="auto">
         {activePageData?.map?.((transaction, index) => {
           const acc = accounts?.find((a) => a?.id === transaction.acct);
@@ -83,6 +84,7 @@ const TransactionsTable = ({
             <TransactionRow
               key={transaction?.id}
               index={index}
+              skipList={skipList}
               transaction={transaction}
               account={acc}
               category={category}
@@ -193,7 +195,8 @@ TransactionsTable.propTypes = {
   linkPayee: PropTypes.bool,
   account: PropTypes.shape({
     id: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  skipList: PropTypes.array
 };
 
 TransactionsTable.defaultProps = {
@@ -205,7 +208,8 @@ TransactionsTable.defaultProps = {
   payees: [],
   rowsCount: 0,
   linkCategory: false,
-  linkPayee: false
+  linkPayee: false,
+  skipList: []
 };
 
 export default TransactionsTable;

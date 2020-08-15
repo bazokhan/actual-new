@@ -2,13 +2,14 @@
 import PropTypes from 'prop-types';
 import { Heading, Flex, Icon } from '@chakra-ui/core';
 
-const SectionHeading = ({ children, ...props }) => (
+const SectionHeading = ({ children, containerProps, ...props }) => (
   <Flex
     justifyContent="start"
     alignItems="center"
     my="10px"
     p="20px"
     boxShadow="md"
+    {...containerProps}
   >
     <Icon
       color="blue.600"
@@ -23,7 +24,12 @@ const SectionHeading = ({ children, ...props }) => (
 );
 
 SectionHeading.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  containerProps: PropTypes.object
+};
+
+SectionHeading.defaultProps = {
+  containerProps: {}
 };
 
 export default SectionHeading;

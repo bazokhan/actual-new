@@ -42,7 +42,7 @@ export const getServerSideProps = async ({ params: { account } }) => {
   }
 };
 
-const Home = ({ accounts, dates, categories, payees }) => {
+const Dates = ({ accounts, dates, categories, payees }) => {
   const {
     query: { account: accountid }
   } = useRouter();
@@ -62,7 +62,8 @@ const Home = ({ accounts, dates, categories, payees }) => {
           { url: '', name: 'Transactions' },
           { url: 'categories', name: 'Categories' },
           { url: 'payees', name: 'Payees' },
-          { url: 'revision', name: 'Revision' }
+          { url: 'revision', name: 'Revision' },
+          { url: 'balance', name: 'Balance Sheet' }
         ]}
       />
       <Flex flexDirection="column" overflowY="auto">
@@ -119,18 +120,18 @@ const Home = ({ accounts, dates, categories, payees }) => {
   );
 };
 
-Home.propTypes = {
+Dates.propTypes = {
   accounts: PropTypes.array,
   categories: PropTypes.array,
   payees: PropTypes.array,
   dates: PropTypes.object
 };
 
-Home.defaultProps = {
+Dates.defaultProps = {
   accounts: [],
   categories: [],
   payees: [],
   dates: {}
 };
 
-export default Home;
+export default Dates;

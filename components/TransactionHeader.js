@@ -17,29 +17,39 @@ TableText.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-const TransactionHeader = ({ account }) => (
-  <Grid gridTemplateColumns="60px 1fr 1fr 1fr 1fr 1fr">
+const TransactionHeader = ({ account, skipList }) => (
+  <Grid gridTemplateColumns={`60px repeat(${6 - skipList.length}, 1fr)`}>
     <TableText>#</TableText>
-    <Link href="/accounts">
-      <TableText>Account</TableText>
-    </Link>
-    <TableText>Amount</TableText>
-    <Link href={`/accounts/${account?.id}/payees`}>
-      <TableText>Payee</TableText>
-    </Link>
-    <Link href={`/accounts/${account?.id}/categories`}>
-      <TableText>Category</TableText>
-    </Link>
-    <Link href={`/accounts/${account?.id}/dates`}>
-      <TableText>Date</TableText>
-    </Link>
+    {skipList.includes('account') ? null : (
+      <Link href="/accounts">
+        <TableText>Account</TableText>
+      </Link>
+    )}
+    {skipList.includes('amount') ? null : <TableText>Amount</TableText>}
+    {skipList.includes('payee') ? null : (
+      <Link href={`/accounts/${account?.id}/payees`}>
+        <TableText>Payee</TableText>
+      </Link>
+    )}
+    {skipList.includes('category') ? null : (
+      <Link href={`/accounts/${account?.id}/categories`}>
+        <TableText>Category</TableText>
+      </Link>
+    )}
+    {skipList.includes('notes') ? null : <TableText>Notes</TableText>}
+    {skipList.includes('date') ? null : (
+      <Link href={`/accounts/${account?.id}/dates`}>
+        <TableText>Date</TableText>
+      </Link>
+    )}
   </Grid>
 );
 
 TransactionHeader.propTypes = {
   account: PropTypes.shape({
     id: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  skipList: PropTypes.array.isRequired
 };
 
 export default TransactionHeader;
