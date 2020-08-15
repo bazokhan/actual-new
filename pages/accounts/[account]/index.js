@@ -69,7 +69,8 @@ const Account = ({
           { url: 'categories', name: 'Categories' },
           { url: 'payees', name: 'Payees' },
           { url: 'revision', name: 'Revision' },
-          { url: 'dates', name: 'By Date' }
+          { url: 'dates', name: 'By Date' },
+          { url: 'balance', name: 'Balance Sheet' }
         ]}
       />
       <TransactionsTable

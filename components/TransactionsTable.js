@@ -174,9 +174,9 @@ const TransactionsTable = ({
           </Select>
         </Grid>
         <Text margin="0 auto 5px" fontSize="14px" color="gray.700">
-          transactions from {activePageData?.[0]?.index + 1} to{' '}
-          {activePageData?.[activePageData.length - 1]?.index + 1} out of total{' '}
-          {rowsCount} transactions
+          transactions from {activePageData?.[0]?.index + 1 || 0} to{' '}
+          {activePageData?.[activePageData.length - 1]?.index + 1 || 0} out of
+          total {rowsCount} transactions
         </Text>
       </Flex>
     </Grid>

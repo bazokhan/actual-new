@@ -57,13 +57,19 @@ const TransactionRow = ({
       <Link href={`/accounts/${account.id}/payees/${payee.id}`}>
         <TableText>
           {/* Special for payee only */}
-          {payee.name || payee.transferAccount?.name || 'Unknown Payee'}
+          {payee.name ||
+            payee.transferAccount?.name ||
+            transaction?.payeeName ||
+            'Unknown Payee'}
         </TableText>
       </Link>
     ) : (
       <TableText>
         {/* Special for payee only */}
-        {payee.name || payee.transferAccount?.name || 'Unknown Payee'}
+        {payee.name ||
+          payee.transferAccount?.name ||
+          transaction?.payeeName ||
+          'Unknown Payee'}
       </TableText>
     )}
     {skipList.includes('category') ? null : linkCategory &&
@@ -89,7 +95,8 @@ TransactionRow.propTypes = {
     index: PropTypes.number,
     amount: PropTypes.number,
     date: PropTypes.number,
-    notes: PropTypes.string
+    notes: PropTypes.string,
+    payeeName: PropTypes.string
   }).isRequired,
   account: PropTypes.shape({
     id: PropTypes.string,

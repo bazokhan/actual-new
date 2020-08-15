@@ -87,10 +87,10 @@ export const getDatesWithDetails = (
         }
       }
       const transferAccount = accounts.find(
-        (a) => a.id === payee?.tranfer_acct
+        (a) => a.id === payee?.transfer_acct
       );
       if (transferAccount) {
-        t.isTranfer = true;
+        t.isTransfer = true;
         t.transferAccountInfo = transferAccount;
         t.payeeName = transferAccount.name;
       }
