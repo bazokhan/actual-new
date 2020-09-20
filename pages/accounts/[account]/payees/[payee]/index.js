@@ -53,7 +53,7 @@ const Payee = ({
   const account = accounts?.find((a) => a.id === accountid);
   const payee = payees?.find((p) => p.id === payeeid);
   // Special for payee only
-  const transferAccount = accounts?.find((a) => a.id === payee.transfer_acct);
+  const transferAccount = accounts?.find((a) => a.id === payee?.transfer_acct);
   const payeeName = payee?.name || transferAccount?.name || 'Unknown Payee';
 
   return (

@@ -1,7 +1,7 @@
 {
   "db": {
-    "hash": "af3e4c31f8df455c1145800cd35377f5dc16c3238312c70ec9844fde860517f8",
-    "size": 8630272,
+    "hash": "c51fcddaefdbf44d7d8fb695d8849c3a3266285473f8a80b8a06d2c7d2808edf",
+    "size": 10305536,
     "file": "./db/db.sqlite",
     "tables": {
       "pending_transactions": {
@@ -11,7 +11,7 @@
         "count": 0
       },
       "spreadsheet_cells": {
-        "count": 3974
+        "count": 6135
       },
       "__migrations__": {
         "count": 6
@@ -20,31 +20,31 @@
         "count": 0
       },
       "accounts": {
-        "count": 3
+        "count": 7
       },
       "category_mapping": {
-        "count": 29
+        "count": 43
       },
       "transactions": {
-        "count": 3617
+        "count": 4123
       },
       "messages_crdt": {
-        "count": 31313
+        "count": 36523
       },
       "messages_clock": {
         "count": 1
       },
       "categories": {
-        "count": 29
+        "count": 43
       },
       "payees": {
-        "count": 122
+        "count": 132
       },
       "payee_rules": {
         "count": 3
       },
       "payee_mapping": {
-        "count": 122
+        "count": 132
       },
       "category_groups": {
         "count": 5

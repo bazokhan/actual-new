@@ -93,7 +93,7 @@ const TransactionsTable = ({
               payee={{
                 ...payee,
                 transferAccount: accounts?.find(
-                  (a) => a.id === payee.transfer_acct
+                  (a) => a.id === payee?.transfer_acct
                 )
               }}
               linkCategory={linkCategory}

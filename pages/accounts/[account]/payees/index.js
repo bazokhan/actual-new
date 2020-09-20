@@ -66,7 +66,7 @@ const Payees = ({ accounts, payees, categories }) => {
         {payees?.map((payee) => {
           // Special for payee only
           const transferAccount = accounts?.find(
-            (a) => a.id === payee.transfer_acct
+            (a) => a.id === payee?.transfer_acct
           );
           return (
             <TransactionFieldCard
