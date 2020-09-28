@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { TYPES, query, loadAll } from 'libs/query';
@@ -50,7 +51,7 @@ const Timeline = ({ accounts, dates, categories, payees }) => {
   const account = accounts?.find((a) => a.id === accountid);
   const payee = payees?.find((p) => p.id === payeeid);
   // Special for payee only
-  const transferAccount = accounts?.find((a) => a.id === payee.transfer_acct);
+  const transferAccount = accounts?.find((a) => a.id === payee?.transfer_acct);
   const payeeName = payee?.name || transferAccount?.name || 'Unknown Payee';
 
   return (

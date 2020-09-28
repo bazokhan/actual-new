@@ -17,10 +17,12 @@
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
     "emotion-theming": "^10.0.27",
+    "file-saver": "^2.0.2",
     "next": "9.4.4",
     "nprogress": "^0.2.0",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "xlsx": "^0.16.7"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable camelcase */
 import PropTypes from 'prop-types';
 import {
   Grid,
@@ -13,6 +15,7 @@ import TransactionHeader from './TransactionHeader';
 import TransactionRow from './TransactionRow';
 import usePagination from '../hooks/usePagination';
 import { loadAll } from '../libs/query';
+import ExportCSV from './ExportCVS';
 
 const TransactionsTable = ({
   transactions,
@@ -71,6 +74,41 @@ const TransactionsTable = ({
       overflowY="hidden"
       gridTemplateRows="auto 1fr"
     >
+      <ExportCSV
+        csvData={transactions
+          .sort((a, b) => a.date - b.date)
+          .map((t, index) => {
+            const acc = accounts?.find((a) => a?.id === t.acct);
+            const payee = payees?.find((p) => p?.id === t.description);
+            const category = categories?.find((c) => c?.id === t.category);
+            const [pounds, pennies] = ((t.amount || 0) / 100)
+              .toFixed(2)
+              .toString()
+              .split('.');
+            const dateString = t.date?.toString();
+            const year = dateString?.slice(0, 4);
+            const month = dateString?.slice(4, 6);
+            const day = dateString?.slice(6, 8);
+            return {
+              index: index + 1,
+              account: acc?.name || 'No Account',
+              amount: pounds.slice(0, -3).length
+                ? pounds.slice(0, -3) === '-'
+                  ? `${pounds}.${pennies}`
+                  : `${pounds.slice(0, -3)},${pounds.slice(-3)}.${pennies}`
+                : `${pounds.slice(-3)}.${pennies}`,
+              payee:
+                payee?.name ||
+                payee?.transferAccount?.name ||
+                t?.payeeName ||
+                'Unknown Payee',
+              category: category?.name || 'Uncategorized',
+              notes: t?.notes,
+              date: `${day}-${month}-${year}`
+            };
+          })}
+        fileName={Date.now()}
+      />
       <TransactionHeader account={account} skipList={skipList} />
       <Grid overflowY="auto">
         {activePageData?.map?.((transaction, index) => {
@@ -93,7 +131,7 @@ const TransactionsTable = ({
               payee={{
                 ...payee,
                 transferAccount: accounts?.find(
-                  (a) => a.id === payee.transfer_acct
+                  (a) => a.id === payee?.transfer_acct
                 )
               }}
               linkCategory={linkCategory}
