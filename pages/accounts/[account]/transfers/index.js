@@ -8,9 +8,9 @@ import { getDatesWithDetails } from 'libs/transactions';
 import MainLayout from 'layouts/MainLayout';
 import Navbar from 'components/Navbar';
 import { useState } from 'react';
-import BalanceSheet from 'components/BalanceSheet';
 import DateSelectHeader from 'components/DateSelectHeader';
 import EmptyText from 'components/EmptyText';
+import TransactionsTable from 'components/TransactionsTable';
 
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
@@ -48,7 +48,7 @@ export const getServerSideProps = async ({ params: { account } }) => {
   }
 };
 
-const Balance = ({ dates, accounts }) => {
+const Transfer = ({ dates, accounts }) => {
   const {
     query: { account: accountid }
   } = useRouter();
@@ -91,23 +91,24 @@ const Balance = ({ dates, accounts }) => {
                     month === 'transactions' ||
                     month === 'categories' ||
                     month === 'payees' ? null : (
-                      <BalanceSheet
+                      <TransactionsTable
                         key={month}
                         account={account}
-                        date={month}
-                        transactions={dates[year][month].transactions}
-                        categories={dates[year][month].categories}
+                        transactions={dates[year][month].transactions.filter(
+                          (t) => t.isTransfer
+                        )}
                       />
                     )
                   ) : null
                 )
               ) : (
-                <BalanceSheet
+                <TransactionsTable
                   key={year}
                   account={account}
-                  date={year}
-                  transactions={dates[year].transactions}
-                  categories={dates[year].categories}
+                  skipList={['category', 'account', 'notes']}
+                  transactions={dates[year].transactions.filter(
+                    (t) => t.isTransfer
+                  )}
                 />
               )
             ) : null
@@ -120,14 +121,14 @@ const Balance = ({ dates, accounts }) => {
   );
 };
 
-Balance.propTypes = {
+Transfer.propTypes = {
   accounts: PropTypes.array,
   dates: PropTypes.object
 };
 
-Balance.defaultProps = {
+Transfer.defaultProps = {
   accounts: [],
   dates: {}
 };
 
-export default Balance;
+export default Transfer;

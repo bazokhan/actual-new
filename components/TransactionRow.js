@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
 import { Grid, Text } from '@chakra-ui/core';
 import PropTypes from 'prop-types';
@@ -33,11 +34,12 @@ const TransactionRow = ({
   payee,
   linkCategory,
   linkPayee,
+  skipList,
   ...props
 }) => (
   <Grid
     key={transaction.id}
-    gridTemplateColumns="60px 1fr 1fr 1fr 1fr 1fr"
+    gridTemplateColumns={`60px repeat(${6 - skipList.length}, 1fr)`}
     alignItems="center"
     bg={index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : '#fff'}
     {...props}
@@ -45,29 +47,44 @@ const TransactionRow = ({
     <TableText>
       {transaction.index + 1 ? (transaction.index + 1).toString() : '-'}
     </TableText>
-    <TableText>{account?.name || 'No Account'}</TableText>
-    <MoneyText amount={transaction.amount || 0} />
-    {linkPayee && account && payee ? (
+    {skipList.includes('account') ? null : (
+      <TableText>{account?.name || 'No Account'}</TableText>
+    )}
+    {skipList.includes('amount') ? null : (
+      <MoneyText amount={transaction.amount || 0} />
+    )}
+    {skipList.includes('payee') ? null : linkPayee && account && payee ? (
       <Link href={`/accounts/${account.id}/payees/${payee.id}`}>
         <TableText>
           {/* Special for payee only */}
-          {payee.name || payee.transferAccount?.name || 'Unknown Payee'}
+          {payee.name ||
+            payee.transferAccount?.name ||
+            transaction?.payeeName ||
+            'Unknown Payee'}
         </TableText>
       </Link>
     ) : (
       <TableText>
         {/* Special for payee only */}
-        {payee.name || payee.transferAccount?.name || 'Unknown Payee'}
+        {payee.name ||
+          payee.transferAccount?.name ||
+          transaction?.payeeName ||
+          'Unknown Payee'}
       </TableText>
     )}
-    {linkCategory && account && category ? (
+    {skipList.includes('category') ? null : linkCategory &&
+      account &&
+      category ? (
       <Link href={`/accounts/${account.id}/categories/${category.id}`}>
         <TableText>{category.name}</TableText>
       </Link>
     ) : (
       <TableText>{category?.name || 'Uncategorized'}</TableText>
     )}
-    <DateText date={transaction?.date} />
+    {skipList.includes('notes') ? null : (
+      <Text textAlign="right">{transaction?.notes}</Text>
+    )}
+    {skipList.includes('date') ? null : <DateText date={transaction?.date} />}
   </Grid>
 );
 
@@ -77,7 +94,9 @@ TransactionRow.propTypes = {
     id: PropTypes.string,
     index: PropTypes.number,
     amount: PropTypes.number,
-    date: PropTypes.number
+    date: PropTypes.number,
+    notes: PropTypes.string,
+    payeeName: PropTypes.string
   }).isRequired,
   account: PropTypes.shape({
     id: PropTypes.string,
@@ -96,7 +115,8 @@ TransactionRow.propTypes = {
     })
   }),
   linkCategory: PropTypes.bool,
-  linkPayee: PropTypes.bool
+  linkPayee: PropTypes.bool,
+  skipList: PropTypes.array.isRequired
 };
 
 TransactionRow.defaultProps = {

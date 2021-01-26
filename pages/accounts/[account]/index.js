@@ -8,7 +8,12 @@ import Navbar from 'components/Navbar';
 
 export const getServerSideProps = async ({ params: { account } }) => {
   try {
-    const { data, next, nextUrl, rowsCount } = await query('transactions', {
+    const {
+      data = [],
+      next = null,
+      nextUrl = null,
+      rowsCount = 0
+    } = await query('transactions', {
       where: [
         { column: 'acct', type: TYPES.EXACT, value: account },
         { column: 'tombstone', type: TYPES.EXACT, value: 0 }
@@ -64,7 +69,8 @@ const Account = ({
           { url: 'categories', name: 'Categories' },
           { url: 'payees', name: 'Payees' },
           { url: 'revision', name: 'Revision' },
-          { url: 'dates', name: 'By Date' }
+          { url: 'dates', name: 'By Date' },
+          { url: 'balance', name: 'Balance Sheet' }
         ]}
       />
       <TransactionsTable

@@ -61,7 +61,8 @@ const Revision = ({ accounts, categories, payees }) => {
           { url: '', name: 'Transactions' },
           { url: 'categories', name: 'Categories' },
           { url: 'payees', name: 'Payees' },
-          { url: 'dates', name: 'By Date' }
+          { url: 'dates', name: 'By Date' },
+          { url: 'balance', name: 'Balance Sheet' }
         ]}
       />
       <Flex flexDirection="column" overflowY="auto">

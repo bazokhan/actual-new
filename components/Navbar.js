@@ -5,7 +5,7 @@ import AccountSectionLink from './AccountSectionLink';
 
 const Navbar = ({ account, title, sections }) => (
   <Grid
-    gridTemplateColumns={`auto repeat(${sections.length}, auto) 1fr`}
+    gridTemplateColumns={`auto repeat(${sections.length || 1}, auto) 1fr`}
     boxShadow="0 3px 3px 0 rgba(0, 0, 0, 0.16)"
     columnGap="10px"
     p="5px 10px"

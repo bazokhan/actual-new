@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
 import { Flex } from '@chakra-ui/core';
@@ -58,14 +59,15 @@ const Payees = ({ accounts, payees, categories }) => {
           { url: '', name: 'Transactions' },
           { url: 'categories', name: 'Categories' },
           { url: 'revision', name: 'Revision' },
-          { url: 'dates', name: 'By Date' }
+          { url: 'dates', name: 'By Date' },
+          { url: 'balance', name: 'Balance Sheet' }
         ]}
       />
       <Flex wrap="wrap" overflowY="auto">
         {payees?.map((payee) => {
           // Special for payee only
           const transferAccount = accounts?.find(
-            (a) => a.id === payee.transfer_acct
+            (a) => a.id === payee?.transfer_acct
           );
           return (
             <TransactionFieldCard

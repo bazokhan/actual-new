@@ -18,7 +18,7 @@ const Sidebar = ({ accounts }) => (
     <Link my="10px" href="/accounts">
       <Icon name="sun" size="30px" color="white" />
     </Link>
-    {accounts.map((account) => (
+    {accounts?.map((account) => (
       <Fragment key={account.id}>
         <Link my="10px" href={`/accounts/${account.id}`}>
           <Avatar size="md" name={account.name} />
