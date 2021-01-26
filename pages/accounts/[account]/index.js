@@ -18,12 +18,12 @@ export const getServerSideProps = async ({ params: { account } }) => {
     return {
       props: {
         transactions: data,
-        next,
-        nextUrl,
-        rowsCount,
-        accounts,
-        categories,
-        payees
+        next: next || null,
+        nextUrl: nextUrl || null,
+        rowsCount: rowsCount || 0,
+        accounts: accounts || [],
+        categories: categories || [],
+        payees: payees || []
       }
     };
   } catch {

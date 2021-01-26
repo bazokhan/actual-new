@@ -18,6 +18,53 @@ export const getDates = (transactions) =>
     return prev;
   }, {}) || {};
 
+export const getDatesWithDetails = (transactions, categories, payees) =>
+  transactions?.reduce((prev, t) => {
+    const dateString = t.date.toString();
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
+    prev[year] = prev[year] || {};
+    prev[year].transactions = prev[year].transactions || [];
+    prev[year].transactions.push(t);
+
+    prev[year][month] = prev[year][month] || {};
+    prev[year][month].transactions = prev[year][month].transactions || [];
+    prev[year][month].transactions.push(t);
+
+    prev[year][month][day] = prev[year][month][day] || {};
+    prev[year][month][day].transactions =
+      prev[year][month][day].transactions || [];
+    prev[year][month][day].transactions.push(t);
+
+    /** Categories */
+    const category = categories?.find((c) => t.category === c.id) || null;
+    if (category) {
+      t.category = category;
+      prev[year].categories = prev[year].categories || [];
+      prev[year].categories.push(category);
+      prev[year][month].categories = prev[year][month].categories || [];
+      prev[year][month].categories.push(category);
+      prev[year][month][day].categories =
+        prev[year][month][day].categories || [];
+      prev[year][month][day].categories.push(category);
+    }
+
+    /** Payees */
+    const payee = payees?.find((p) => t.description === p.id) || null;
+    if (payee) {
+      t.payee = payee;
+      prev[year].payees = prev[year].payees || [];
+      prev[year].payees.push(payee);
+      prev[year][month].payees = prev[year][month].payees || [];
+      prev[year][month].payees.push(payee);
+      prev[year][month][day].payees = prev[year][month][day].payees || [];
+      prev[year][month][day].payees.push(payee);
+    }
+
+    return prev;
+  }, {}) || {};
+
 export const getCategories = (transactions, categories) =>
   (
     transactions?.reduce((prev, t) => {

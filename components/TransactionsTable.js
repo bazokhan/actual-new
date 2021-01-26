@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import PropTypes from 'prop-types';
 import {
   Grid,
@@ -91,7 +92,7 @@ const TransactionsTable = ({
               payee={{
                 ...payee,
                 transferAccount: accounts?.find(
-                  (a) => a.id === payee.transfer_acct
+                  (a) => a.id === payee?.transfer_acct
                 )
               }}
               linkCategory={linkCategory}
