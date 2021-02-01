@@ -6,7 +6,7 @@
     "count-db": "datasette inspect ./db/db.sqlite --inspect-file=counts.json",
     "start-db": "datasette serve --cors --metadata metadata.json -i ./db/db.sqlite --inspect-file=counts.json",
     "serve-db": "yarn count-db && yarn start-db",
-    "serve-client": "next dev",
+    "serve-client": "next dev -p 3004",
     "dev": "concurrently \"yarn:serve-*\"",
     "build": "next build",
     "start": "next start",
